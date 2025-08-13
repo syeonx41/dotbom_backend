@@ -11,11 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Table(name = "training")
 public class Training {
 
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
