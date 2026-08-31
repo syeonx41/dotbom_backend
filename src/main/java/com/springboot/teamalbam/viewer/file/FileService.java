@@ -19,6 +19,14 @@ public class FileService {
     private final FileTypeValidator fileTypeValidator;
     private final Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
 
+    private Path resolveSafePath(String fileId) {
+        Path targetPath = uploadDir.resolve(fileId).normalize();
+        if (!targetPath.startsWith(uploadDir)) {
+            throw new IllegalArgumentException("잘못된 파일 경로입니다: " + fileId);
+        }
+        return targetPath;
+    }
+
     public String store(MultipartFile file) {
         fileTypeValidator.validate(file);
 
@@ -27,10 +35,10 @@ public class FileService {
                 Files.createDirectories(uploadDir);
             }
 
-            String originalFilename = file.getOriginalFilename();
+            String originalFilename = Paths.get(file.getOriginalFilename()).getFileName().toString();
             String fileId = UUID.randomUUID() + "_" + originalFilename;
 
-            Path targetPath = uploadDir.resolve(fileId);
+            Path targetPath = resolveSafePath(fileId);
             file.transferTo(targetPath.toFile());
 
             return fileId;
@@ -40,7 +48,7 @@ public class FileService {
     }
 
     public void delete(String fileId) throws FileNotFoundException {
-        Path targetPath = uploadDir.resolve(fileId);
+        Path targetPath = resolveSafePath(fileId);
 
         if (!Files.exists(targetPath)) {
             throw new FileNotFoundException("파일이 존재하지 않습니다: " + fileId);
@@ -53,10 +61,10 @@ public class FileService {
         }
     }
 
-    public File getFileById(String fileId) {
-        Path targetPath = Paths.get(System.getProperty("user.dir"), "uploads").resolve(fileId);
+    public File getFileById(String fileId) throws FileNotFoundException {
+        Path targetPath = resolveSafePath(fileId);
         if (!Files.exists(targetPath)) {
-            throw new RuntimeException("파일이 존재하지 않음: " + fileId);
+            throw new FileNotFoundException("파일이 존재하지 않습니다: " + fileId);
         }
         return targetPath.toFile();
     }
