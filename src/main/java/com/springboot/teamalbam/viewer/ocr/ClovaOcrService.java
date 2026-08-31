@@ -20,8 +20,12 @@ public class ClovaOcrService {
     @Value("${clova.ocr.secret-key}")
     private String secretKey;
 
-    private static final String CLOVA_OCR_BASE_URL = "https://s30jyww021.apigw.ntruss.com";
-    private static final String CLOVA_OCR_PATH = "/custom/v1/44804/a760cf55bbc9908d47b22fabc4e20b195477b74a8056b093eee733a031246dc5/general";
+    @Value("${clova.ocr.base-url}")
+    private String baseUrl;
+
+    @Value("${clova.ocr.path}")
+    private String path;
+
 
     public String requestOcr(File imageFile) throws IOException {
         byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
@@ -40,11 +44,11 @@ public class ClovaOcrService {
         body.put("images", Collections.singletonList(imageMap));
 
         WebClient client = WebClient.builder()
-                .baseUrl(CLOVA_OCR_BASE_URL)
+                .baseUrl(baseUrl)
                 .build();
 
         return client.post()
-                .uri(CLOVA_OCR_PATH)
+                .uri(path)
                 .header("X-OCR-SECRET", secretKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
@@ -79,11 +83,11 @@ public class ClovaOcrService {
         body.put("images", Collections.singletonList(imageMap));
 
         WebClient client = WebClient.builder()
-                .baseUrl(CLOVA_OCR_BASE_URL)
+                .baseUrl(baseUrl)
                 .build();
 
         String response = client.post()
-                .uri(CLOVA_OCR_PATH)
+                .uri(path)
                 .header("X-OCR-SECRET", secretKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
