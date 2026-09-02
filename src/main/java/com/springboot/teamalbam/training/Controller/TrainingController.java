@@ -7,6 +7,7 @@ import com.springboot.teamalbam.user.Repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -52,5 +53,16 @@ public class TrainingController {
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @GetMapping("/attempts")
+    public ResponseEntity<Integer> getAttempts(HttpServletRequest request) {
+        String uuid = getUuidFromCookie(request);
+        if (uuid == null) return ResponseEntity.ok(0);
+
+        User user = userRepository.findByUuid(uuid).orElse(null);
+        if (user == null) return ResponseEntity.ok(0);
+
+        return ResponseEntity.ok(user.getAttemptsLeft());
     }
 }
