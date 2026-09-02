@@ -18,3 +18,9 @@ CREATE TABLE IF NOT EXISTS `option` (
                                         training_id BIGINT,
                                         FOREIGN KEY (training_id) REFERENCES training(id) -- 이 부분을 training으로 수정해야 합니다.
     );
+
+CREATE TABLE IF NOT EXISTS user (
+                                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                    uuid VARCHAR(255),
+    attempts_left INT
+    );
